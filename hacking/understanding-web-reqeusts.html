@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>web-requests</title>
+    <title>HTTP and HTTPS Flow</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
 
     <header>
-        <h1>Web Requests</h1>
+        <h1>HTTP and HTTPS Flow</h1>
     </header>
 
     <nav>
@@ -20,9 +20,11 @@
         <a href="contact.html">Contact</a>
     </nav>
 
+    <p>Here I've explored the intricacies of both HTTP and HTTPS protocols, understanding their flows and
+        security implications.</p>
+
     <section id="web-requests-section">
-        <h2>Web Requests</h2>
-        <p>We've discussed basic web requests and different methods that we can include in a web requests.</p>
+        <h2>HTTP Requests</h2>
         <ul>
             <li> Today, the majority of the applications we use constantly interact with the internet, both web and
                 mobile applications. Most internet communications are made with web requests through the HTTP protocol.
@@ -34,13 +36,70 @@
                 configuration. The same requests are utilized when we use the internet to visit different websites. We
                 enter a Fully Qualified Domain Name (FQDN) as a Uniform Resource Locator (URL) to reach the desired
                 website.
-                <img src="/images/url_structure.jpeg" alt="http flow diagram." style="width:128px;height:128px;" />
+                <img src="/hacking/images/url_structure.jpeg" alt="breaking down an URL structure."
+                    style="width:auto;height:128px;" />
+            <li>
+                HTTP, or Hypertext Transfer Protocol, is the foundation of web communication. When a user accesses a
+                website, their browser initiates an HTTP request to the server hosting the site.
+                <img src="/hacking/images/HTTP_Flow.webp" alt="HTTP flow" style="width: auto;height: 200px;">
+            </li>
+            <li>
+                The request typically begins with the browser resolving the domain name to an IP address using DNS
+                (Domain Name System). Once resolved, the browser sends a GET request to the server's default HTTP port
+                (port 80), asking for the root path (/).
+            </li>
+            <li>
+                Upon receiving the request, the server processes it and returns the requested resource, often an index
+                file. However, all data exchanged during this process is transmitted in clear-text, making it vulnerable
+                to interception and eavesdropping.
+            </li>
+            <li>Our browsers usually first look up records in the local '/etc/hosts' file, and if the requested domain
+                does not exist within it, then they would contact other DNS servers. We can use the '/etc/hosts' to
+                manually add records to for DNS resolution, by adding the IP followed by the domain name.</li>
+        </ul>
+
+        <h2>HTTPS Requests</h2>
+        <ul>
+            <li>
+                HTTPS, or Hypertext Transfer Protocol Secure, addresses the security shortcomings of HTTP by encrypting
+                data transmission between the client and server.
+                <img src="/hacking/images/HTTPS_Flow.webp" alt="HTTPS flow structure"
+                    style="width: 400px; height: auto;">
+            </li>
+            <li>
+                When a user attempts to access a website via HTTPS, their browser establishes a secure connection with
+                the server by following a series of steps known as the SSL/TLS handshake. This process includes key
+                exchange and certificate verification to ensure the authenticity and integrity of the communication.
+            </li>
+            <li>
+                Once the secure connection is established, HTTP communication continues, but all data exchanged is
+                encrypted, providing confidentiality and protection against eavesdropping.
+            </li>
+            <li>
+                If we type http:// instead of https:// to visit a website that enforces HTTPS, the browser attempts to
+                resolve the domain and redirects the user to the webserver hosting the target website. A request is sent
+                to port 80 first, which is the unencrypted HTTP protocol. The server detects this and redirects the
+                client to secure HTTPS port 443 instead. This is done via the 301 Moved Permanently response code.
+            </li>
+        </ul>
+
+        <h2>cURL</h2>
+        <ul>
+            <li>
+                cURL (client URL) is a command-line tool and library that primarily supports HTTP, HTTPS along with many
+                other protocols.
+                <img src="/hacking/images/cURL_cheatsheet.png" alt="cURL cheat sheet"
+                    style="width: 500px; height: auto;">
+            </li>
+            <li>Same functionality as cURL could alos be achieved by any web browser. Most modern web browsers come with
+                built-in developer tools (DevTools).
+                <img src="/hacking/images/Web_DevTool.webp" alt="Dev Tool Image" style="width: auto; height: 500px;">
             </li>
         </ul>
     </section>
 
     <footer>
-        <p>&copy; 2024 brsd. All rights reserved.</p>
+        <p>&copy; 2024 bijayrajsinghdeo. All rights reserved.</p>
     </footer>
 
 </body>
