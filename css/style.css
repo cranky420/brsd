@@ -56,7 +56,7 @@ h2 {
 }
 
 ul {
-    /* list-style: none; Remove default list styles */
+    list-style: none; /*Remove default list styles */
 }
 
 ul li {
