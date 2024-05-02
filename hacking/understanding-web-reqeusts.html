@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTTP and HTTPS Flow</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/xp.css" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakura.css/css/sakura.css" type="text/css">
     <style>
         body {
             text-align: center;
@@ -27,6 +29,13 @@
         }
     </style>
 </head>
+
+<canvas id="c"><p>test canvas</p></canvas>
+    <script  type="importmap">{
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js"
+        }
+    }</script>
 
 <body>
 
@@ -124,7 +133,7 @@
         <button onclick="toggleDarkMode()">Dark Mode</button>
     </footer>
 
-    <script src="/brsd/js/dark-mode.js"></script>
+    <script type="module" src="/test.js"></script>
 
 </body>
 

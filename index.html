@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bijayrajsinghdeo</title>
-    <link rel="stylesheet" href="css/style.css" id="stylesheet">
+    <!-- <link rel="stylesheet" href="css/test.css" id="stylesheet"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakura.css/css/sakura.css" type="text/css">
     <style>
         body {
             text-align: center;
@@ -42,6 +43,13 @@
         <a href="/brsd/contact.html">Contact</a>
     </nav>
 
+    <canvas id="c"><p>test canvas</p></canvas>
+    <script  type="importmap">{
+        "imports": {
+            "three": "https://threejs.org/build/three.module.js"
+        }
+    }</script>
+
     <section>
         <h2>Hacking</h2>
         <p>Content related to hacking. High priority on cloud, networking, pentests,
@@ -68,7 +76,7 @@
         <button onclick="toggleDarkMode()">Dark Mode</button>
     </footer>
 
-    <script src="/brsd/js/dark-mode.js"></script>
+    <script type="module" src="/test.js"></script>
 </body>
 
 </html>
